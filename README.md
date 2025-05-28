@@ -1,269 +1,127 @@
 # Medsmonitoring
-Medication Monitoring Tool
+Owner: Lead Clinical Pharmacist
+Status: MVP v1.0 – In Progress
+Tech Stack: No-code MVP (Cursor + Lovable)
+Date: May 2025
 
-This README-style PRD is designed for an AI assistant to guide the build of a medication monitoring tool for prescription clerks in general practice. It outlines Key Features, Technical Stack (with pros and cons), Steps to Implementation, and Database Schema.
+🧭 Purpose
+To create a standalone, read-only digital tool that helps prescription clerks in general practice easily access structured, up-to-date medication monitoring guidance — curated by a lead pharmacist. The MVP will be used to validate search functionality, display logic, and ease of use for medication safety tasks.
 
-Key Features
+👥 User Types
+Role	Access Level
+Clerk	Read-only access to medication and drug class data
+Pharmacist	Full CRUD access (admin panel) for data management
 
-Secure Authentication
+🧱 Technical Stack
+Component	Tool	Purpose
+Frontend	Cursor	Drag-and-drop UI builder (low-code capable)
+Backend/DB	Cursor DB	Built-in database collections
+Workflow Logic	Cursor	Conditional UI + logic handling
+Reminders (optional)	Lovable	Later: Add follow-up tasks or workflow checklists
+Deployment	Cursor hosted	Standalone web app
+Authentication	Basic login (Cursor default)	SSO/NHS login deferred
 
-Supabase Auth (email/password, OAuth)
+🗂 Database Schema
+🔹 medications
+Field	Type	Description
+name	Text	Drug name (e.g., "Ramipril")
+class	Relation	Links to drug_classes
+indications	Multi-line Text	Clinical uses (e.g., HTN, CHF)
+normal_dose	Text	Standard dose (e.g., "5mg OD")
+max_dose	Text	Max safe dose
+monitoring	Multi-line Text	Required bloods/tests
+monitoring_freq	Text	e.g., "Every 6 months"
+review_required	Boolean	Is formal review needed?
+review_freq	Text	Frequency if required
+notes	Multi-line Text	Optional safety notes
+high_risk_flag	Boolean	Flag as high-risk (True/False)
 
-Two user roles: read-only clerks and editors/admins
+🔹 drug_classes
+Field	Type	Description
+class_name	Text	Name (e.g., "ACE Inhibitors")
+class_monitoring	Multi-line Text	Shared requirements
+class_notes	Multi-line Text	Optional class-wide comments
 
-Medication Database
+🔎 Core Features – MVP Scope
+🔍 Search Functionality
+Search by drug name or drug class
 
-~500 medications grouped by drug class
+Return drug name, class, and high-risk status
 
-Fields: normal dose, max dose, monitoring parameters & frequency, indications, review frequency
+💊 Medication Detail Page
+Full view of medication data
 
-High-risk flag to highlight extra-monitoring drugs
+Sidebar showing linked drug class details
 
-Search & Navigation
+⚠️ High-Risk Flag Display
+Visual red badge or banner if high_risk_flag = True
 
-Global search by drug name or class
+👨‍⚕️ Admin Panel (Pharmacist Only)
+Table to add, edit, or delete medications and classes
 
-Sidebar displays class summary, indications, monitoring, review schedule for selected drug
+View all data at a glance for fast input updates
 
-Guidelines Sync
+🛠 Implementation Steps
+1. Project Setup in Cursor
+Create new Cursor app
 
-Weekly scheduled import (cron) of NICE and SPS monitoring guidance
+Define medications and drug_classes collections
 
-Subscription & Billing
+Add pages: Dashboard, Drug Detail, Admin Panel
 
-Practice-wide subscription via Stripe Checkout links
+2. UI Design
+Dashboard: Search bar, results list
 
-Tiered pricing by practice size
+Drug Detail Page: Medication info + class sidebar
 
-Admin Dashboard
+Admin Panel: Table view, add/edit/delete buttons
 
-CRUD operations on drugs, classes, and guideline versions
+3. Logic Configuration
+Link medications to class
 
-Onboarding tutorial and guided walkthrough for new users
+Conditional display for high-risk drugs
 
-Non-Functional
+Show class sidebar only if detail page is open
 
-Performance: search latency <300 ms
+4. Data Entry & Testing
+Input 5–10 test medications and classes
 
-Availability: 99.9% uptime
+Test:
 
-Security: GDPR compliance, encryption at rest/in transit
+Search speed
 
-Scalability: support 500 daily active users, scale to 2,000 concurrent
+Flag visibility
 
-Technical Stack
+Navigation ease
 
-Component
+5. User Feedback
+Allow 1–2 clerks to test
 
-Choice
+Collect feedback on:
 
-Pros
+Clarity
 
-Cons
+Ease of use
 
-Backend & Database
+Suggestions for labels/layout
 
-Supabase (PostgreSQL + Edge Functions)
+✅ MVP Acceptance Criteria
+Feature	Metric
+Drug search	<10 seconds to locate 1 drug
+Flag visibility	High-risk clearly displayed
+Admin edits	<60 seconds to update a record
+Clerk usability	No training required
 
-• Single integrated stack
+⏳ Deferred / Future Features (Not MVP)
+Versioning / audit logs
 
-• SQL relational model
+NICE & SPS data integration
 
-• Built-in Auth & Realtime
+NHS SSO login
 
-• Smaller community
+Offline access via PWA
 
-• Cold start edge functions
+Monitoring task automation (Lovable)
 
-Authentication
-
-Supabase Auth
-
-• Easy integration
-
-• Role-based ACL in DB
-
-• Fewer third-party tutorials
-
-Payment Processing
-
-Stripe Checkout
-
-• Hosted checkout pages
-
-• Webhook support for billing events
-
-• External dependency on Stripe
-
-Guideline Sync
-
-Supabase Cron + Edge Function
-
-• Serverless scheduled jobs
-
-• Direct DB writes
-
-• Limited scheduling flexibility
-
-Hosting & CDN
-
-Vercel / Netlify
-
-• Fast global CDN
-
-• Git integration
-
-• Vendor lock-in risk
-
-Frontend
-
-React + Tailwind CSS
-
-• Component-driven UI
-
-• Rapid styling
-
-• Learning curve for Tailwind purists
-
-Monitoring & Logging
-
-Supabase Logs / Sentry
-
-• Integrated logs
-
-• Error tracking
-
-• May need external dashboard setup
-
-Steps to Implementation
-
-Project Setup
-
-Initialize Supabase project
-
-Scaffold React + Tailwind frontend
-
-Configure Vercel/Netlify for hosting
-
-Authentication & Authorization
-
-Enable Supabase Auth providers
-
-Define users table with roles
-
-Implement sign-up, login, and role-based route guards
-
-Database Schema & Admin UI
-
-Create tables: drug_classes, drugs, drug_indications, drug_monitoring, guideline_versions
-
-Build Admin CRUD UI for classes, drugs, and guideline records
-
-Search & Detail Views
-
-Implement full-text search on drugs.name and drug_classes.name
-
-Create detail page with sidebar showing class summary, indications, monitoring, review schedules, and high-risk banner
-
-Guidelines Sync Pipeline
-
-Develop Edge Function to fetch NICE/SPS data
-
-Schedule weekly cron job
-
-Insert/update guideline_versions and link to drugs
-
-Subscription & Billing
-
-Integrate Stripe Checkout links for practice-wide plans
-
-Handle webhooks to update subscription status in users or practices table
-
-Onboarding & Tutorial
-
-Embed guided walkthrough (e.g., using react-joyride) for first-time users
-
-Testing & Verification
-
-Unit tests for edge functions and React components
-
-End-to-end tests for search, detail view, and payment flow
-
-Load testing to validate <300 ms search latency and concurrency targets
-
-Deployment & Monitoring
-
-Set up CI/CD pipelines
-
-Configure error monitoring (Sentry) and logging
-
-Establish a feedback loop with pilot users
-
-Database Schema
-
--- Users & Tenancy
-CREATE TABLE users (
-  id UUID PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  role TEXT CHECK (role IN ('clerk', 'admin')) NOT NULL,
-  practice_id UUID REFERENCES practices(id),
-  created_at TIMESTAMP DEFAULT now()
-);
-
-CREATE TABLE practices (
-  id UUID PRIMARY KEY,
-  name TEXT NOT NULL,
-  stripe_subscription_id TEXT,
-  tier TEXT,
-  created_at TIMESTAMP DEFAULT now()
-);
-
--- Drug Classification
-CREATE TABLE drug_classes (
-  id UUID PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  description TEXT
-);
-
--- Medications
-CREATE TABLE drugs (
-  id UUID PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  class_id UUID REFERENCES drug_classes(id),
-  normal_dose TEXT,
-  max_dose TEXT,
-  high_risk_flag BOOLEAN DEFAULT FALSE
-);
-
--- Indications & Review Frequency
-CREATE TABLE drug_indications (
-  id UUID PRIMARY KEY,
-  drug_id UUID REFERENCES drugs(id),
-  indication TEXT NOT NULL,
-  review_frequency TEXT
-);
-
--- Monitoring Parameters
-CREATE TABLE drug_monitoring (
-  id UUID PRIMARY KEY,
-  drug_id UUID REFERENCES drugs(id),
-  parameter TEXT NOT NULL,
-  frequency TEXT
-);
-
--- Guideline Versioning
-CREATE TABLE guideline_versions (
-  id UUID PRIMARY KEY,
-  source TEXT CHECK (source IN ('NICE', 'SPS')),
-  version TEXT,
-  effective_date DATE,
-  imported_at TIMESTAMP DEFAULT now()
-);
-
--- Link drugs to guideline versions
-CREATE TABLE drug_guidelines (
-  drug_id UUID REFERENCES drugs(id),
-  guideline_id UUID REFERENCES guideline_versions(id),
-  PRIMARY KEY (drug_id, guideline_id)
-);
+These will be scoped in v2 and are intentionally excluded from MVP.
 
